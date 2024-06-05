@@ -24,7 +24,7 @@ class _game
     int number_of_enemies;
     int *map;
     int *tmp_map;
-    size_t map_size[3]; // x y map_size
+    sf::Vector3<size_t> map_size;
 
     object player;
     std::vector<object> enemies;

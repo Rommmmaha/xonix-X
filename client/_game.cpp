@@ -20,39 +20,39 @@ void _game::init()
     _RenderWindow = new sf::RenderWindow(sf::VideoMode(800, 600), "xonix-x", sf::Style::Titlebar | sf::Style::Close);
     _RenderWindow->setFramerateLimit(15);
     // Map
-    map_size[0] = _RenderWindow->getSize().x / 10;
-    map_size[1] = _RenderWindow->getSize().y / 10;
-    map_size[2] = map_size[0] * map_size[1];
-    map = new int[map_size[2]];
-    tmp_map = new int[map_size[2]];
-    for (int i = 0; i < map_size[2]; ++i)
+    map_size.x = _RenderWindow->getSize().x / 10;
+    map_size.y = _RenderWindow->getSize().y / 10;
+    map_size.z = map_size.x * map_size.y;
+    map = new int[map_size.z];
+    tmp_map = new int[map_size.z];
+    for (int i = 0; i < map_size.z; ++i)
     {
         map[i] = 0;
         tmp_map[i] = 0;
     }
     // Map borders
-    for (int i = 0; i < map_size[0]; ++i)
+    for (int i = 0; i < map_size.x; ++i)
     {
-        map[pos2index(i, 0, map_size[0])] = 1;
-        map[pos2index(i, 1, map_size[0])] = 1;
-        map[pos2index(i, map_size[1] - 2, map_size[0])] = 1;
-        map[pos2index(i, map_size[1] - 1, map_size[0])] = 1;
+        map[pos2index(i, 0, map_size.x)] = 1;
+        map[pos2index(i, 1, map_size.x)] = 1;
+        map[pos2index(i, map_size.y - 2, map_size.x)] = 1;
+        map[pos2index(i, map_size.y - 1, map_size.x)] = 1;
     }
-    for (int i = 2; i < map_size[1] - 2; ++i)
+    for (int i = 2; i < map_size.y - 2; ++i)
     {
-        map[pos2index(0, i, map_size[0])] = 1;
-        map[pos2index(1, i, map_size[0])] = 1;
-        map[pos2index(map_size[0] - 2, i, map_size[0])] = 1;
-        map[pos2index(map_size[0] - 1, i, map_size[0])] = 1;
+        map[pos2index(0, i, map_size.x)] = 1;
+        map[pos2index(1, i, map_size.x)] = 1;
+        map[pos2index(map_size.x - 2, i, map_size.x)] = 1;
+        map[pos2index(map_size.x - 1, i, map_size.x)] = 1;
     }
     // Player
-    player = object(1, int(map_size[0]) / 2, 1);
+    player = object(1, int(map_size.x) / 2, 1);
     player.direction = -1;
     // Enemies
     enemies.clear();
     for (; enemies.size() < number_of_enemies;)
     {
-        enemies.push_back(object(2, 3 + rand() % (map_size[0] - 6), 3 + rand() % (map_size[1] - 6)));
+        enemies.push_back(object(2, 3 + rand() % (map_size.x - 6), 3 + rand() % (map_size.y - 6)));
     }
     // Colors
     player_color = sf::Color::Green;
@@ -84,8 +84,8 @@ void _game::update()
 {
     // Updating title
     {
-        int preplaced = 4 * (int(map_size[0]) + int(map_size[1]) - 4);
-        float percentage = 100.0f * (count_walls() - preplaced) / (map_size[2] - preplaced);
+        int preplaced = 4 * (int(map_size.x) + int(map_size.y) - 4);
+        float percentage = 100.0f * (count_walls() - preplaced) / (map_size.z - preplaced);
         if (percentage > 90.0f)
         {
             ++number_of_enemies;
@@ -101,6 +101,7 @@ void _game::update()
         title += "% < 90%";
         _RenderWindow->setTitle(title);
     }
+
     // Events
     sf::Event event;
     while (_RenderWindow->pollEvent(event))
@@ -121,7 +122,7 @@ void _game::update()
             case sf::Keyboard::Right:
                 if (((player.direction + event.key.code != sf::Keyboard::Up + sf::Keyboard::Down) &&
                      (player.direction + event.key.code != sf::Keyboard::Left + sf::Keyboard::Right) && !moved) ||
-                    map[pos2index(player.x, player.y, map_size[0])] == 1)
+                    map[pos2index(player.x, player.y, map_size.x)] == 1)
                 {
                     moved = true;
                     player.direction = event.key.code;
@@ -147,33 +148,38 @@ void _game::update()
     wall_color = HSV2RGB(hue, 0.5f, 0.6f);
     path_color = HSV2RGB(hue, 0.4f, 0.2f);
     background_color = HSV2RGB(hue, 0.2f, 0.2f);
+
     // - Calculations
+
     // Player movement
     player.move();
+
     // Prevent player from going out of map
-    if (player.x < 0 || player.x > map_size[0] - 1 || player.y < 0 || player.y > map_size[1] - 1)
+    if (player.x < 0 || player.x > map_size.x - 1 || player.y < 0 || player.y > map_size.y - 1)
     {
         player.direction = -1;
         for (; player.x < 0; player.x++)
             ;
-        for (; player.x > map_size[0] - 1; player.x--)
+        for (; player.x > map_size.x - 1; player.x--)
             ;
         for (; player.y < 0; player.y++)
             ;
-        for (; player.y > map_size[1] - 1; player.y--)
+        for (; player.y > map_size.y - 1; player.y--)
             ;
     }
+
     // Check if player is on path
-    if (map[pos2index(player.x, player.y, map_size[0])] == 2)
+    if (map[pos2index(player.x, player.y, map_size.x)] == 2)
     {
         needInitialization = true;
         return;
     }
+
     // Check if player is on air
-    if (map[pos2index(player.x, player.y, map_size[0])] == 0)
+    if (map[pos2index(player.x, player.y, map_size.x)] == 0)
     {
         // Creating path
-        map[pos2index(player.x, player.y, map_size[0])] = 2;
+        map[pos2index(player.x, player.y, map_size.x)] = 2;
         // Adding Neighbours
         switch (player.direction)
         {
@@ -195,75 +201,73 @@ void _game::update()
             break;
         }
     }
-    if (map[pos2index(player.x, player.y, map_size[0])] == 1)
+
+    if (map[pos2index(player.x, player.y, map_size.x)] == 1)
     {
-        if (map[pos2index(player.previous.x, player.previous.y, map_size[0])] == 2)
+        if (map[pos2index(player.previous.x, player.previous.y, map_size.x)] == 2)
         {
-            for (size_t i = 0; i < map_size[2]; ++i)
+            for (size_t i = 0; i < map_size.z; ++i)
             {
                 if (map[i] == 2)
                     map[i] = 1;
             }
             update_tmp_map();
             std::vector<sf::Vector2i> left, right;
+
             for (auto &i : leftNeighbours)
                 getNeighbours(tmp_map, i, map_size, 'l');
             for (auto &i : rightNeighbours)
                 getNeighbours(tmp_map, i, map_size, 'r');
-            for (sf::Vector2i i{0, 0}; i.y < map_size[1]; ++i.y)
+
+            for (sf::Vector2i i{0, 0}; i.y < map_size.y; ++i.y)
             {
-                for (i.x = 0; i.x < map_size[0]; ++i.x)
+                for (i.x = 0; i.x < map_size.x; ++i.x)
                 {
-                    if (tmp_map[pos2index(i.x, i.y, map_size[0])] == 'l')
+                    if (tmp_map[pos2index(i.x, i.y, map_size.x)] == 'l')
                         left.push_back(i);
-                    if (tmp_map[pos2index(i.x, i.y, map_size[0])] == 'r')
+                    if (tmp_map[pos2index(i.x, i.y, map_size.x)] == 'r')
                         right.push_back(i);
                 }
             }
+
             if (left.size() < right.size())
                 for (auto i : left)
-                    map[pos2index(i.x, i.y, map_size[0])] = 1;
+                    map[pos2index(i.x, i.y, map_size.x)] = 1;
             else
                 for (auto i : right)
-                    map[pos2index(i.x, i.y, map_size[0])] = 1;
+                    map[pos2index(i.x, i.y, map_size.x)] = 1;
+
             leftNeighbours.clear();
             rightNeighbours.clear();
             player.direction = -1;
         }
     }
     player.updateShape();
+
     // Enemies movement
     for (auto &enemy : enemies)
     {
-        if (map[pos2index(enemy.x, enemy.y, map_size[0])] == 1)
-        {
+        if (map[pos2index(enemy.x, enemy.y, map_size.x)] == 1)
             continue;
-        }
-        int x = enemy.x;
-        int y = enemy.y;
+
+        sf::Vector2i old = enemy;
+
         enemy.move();
-        for (; map[pos2index(enemy.x, enemy.y, map_size[0])] == 1;)
+        for (; map[pos2index(enemy.x, enemy.y, map_size.x)] == 1;)
         {
-            enemy.x = x;
-            enemy.y = y;
-            bool changed = false;
-            if (map[pos2index(enemy.x - 1, enemy.y, map_size[0])] == 1 ||
-                map[pos2index(enemy.x + 1, enemy.y, map_size[0])] == 1)
-            {
+            enemy.x = old.x;
+            enemy.y = old.y;
+            int old_direction = enemy.direction;
+
+            if (map[pos2index(enemy.x - 1, enemy.y, map_size.x)] == 1 ||
+                map[pos2index(enemy.x + 1, enemy.y, map_size.x)] == 1)
                 enemy.direction = (enemy.direction + 2) % 4;
-                changed = true;
-            }
-            if (map[pos2index(enemy.x, enemy.y - 1, map_size[0])] == 1)
-            {
+            if (map[pos2index(enemy.x, enemy.y - 1, map_size.x)] == 1)
                 enemy.direction = (enemy.direction + 1) % 4;
-                changed = true;
-            }
-            if (map[pos2index(enemy.x, enemy.y + 1, map_size[0])] == 1)
-            {
+            if (map[pos2index(enemy.x, enemy.y + 1, map_size.x)] == 1)
                 enemy.direction = (enemy.direction - 1) % 4;
-                changed = true;
-            }
-            if (!changed)
+
+            if (old_direction == enemy.direction)
             {
                 switch (enemy.direction)
                 {
@@ -283,8 +287,9 @@ void _game::update()
             }
             enemy.move();
         }
+
         // Check if enemy is on path
-        if (map[pos2index(enemy.x, enemy.y, map_size[0])] == 2)
+        if (map[pos2index(enemy.x, enemy.y, map_size.x)] == 2)
         {
             needInitialization = true;
             return;
@@ -296,9 +301,11 @@ void _game::update()
 void _game::draw()
 {
     // - Render Start
+
     // Background
     _RenderWindow->clear(background_color);
-    // Draw walls
+
+    // Init abojects and colors
     sf::RectangleShape wall(sf::Vector2f(10, 10));
     sf::RectangleShape path(sf::Vector2f(10, 10));
     sf::RectangleShape scanR(sf::Vector2f(10, 10));
@@ -308,6 +315,8 @@ void _game::draw()
     scanL.setFillColor(sf::Color(0, 0, 255, 100));
     scanR.setFillColor(sf::Color(255, 0, 0, 100));
     sf::Vector2i i = sf::Vector2i(0, 0);
+
+    // [d] Drawing sides
     if (debug)
     {
         for (auto &i : leftNeighbours)
@@ -321,28 +330,31 @@ void _game::draw()
             _RenderWindow->draw(scanR);
         }
     }
-    for (i.y = 0; i.y < map_size[1]; ++i.y)
+    for (i.y = 0; i.y < map_size.y; ++i.y)
     {
-        for (i.x = 0; i.x < map_size[0]; ++i.x)
+        for (i.x = 0; i.x < map_size.x; ++i.x)
         {
-            if (map[pos2index(i.x, i.y, map_size[0])] == 1)
+            // Drawing walls
+            if (map[pos2index(i.x, i.y, map_size.x)] == 1)
             {
                 wall.setPosition(sf::Vector2f(i.x * 10.0f, i.y * 10.0f));
                 _RenderWindow->draw(wall);
             }
-            if (map[pos2index(i.x, i.y, map_size[0])] == 2)
+            // Drawing player path
+            if (map[pos2index(i.x, i.y, map_size.x)] == 2)
             {
                 path.setPosition(sf::Vector2f(i.x * 10.0f, i.y * 10.0f));
                 _RenderWindow->draw(path);
             }
-            if (debug && map[pos2index(player.x, player.y, map_size[0])] == 1)
+            // [d] Drawing sides
+            if (debug && map[pos2index(player.x, player.y, map_size.x)] == 1)
             {
-                if (tmp_map[pos2index(i.x, i.y, map_size[0])] == 'l')
+                if (tmp_map[pos2index(i.x, i.y, map_size.x)] == 'l')
                 {
                     scanL.setPosition(sf::Vector2f(i.x * 10.0f, i.y * 10.0f));
                     _RenderWindow->draw(scanL);
                 }
-                if (tmp_map[pos2index(i.x, i.y, map_size[0])] == 'r')
+                if (tmp_map[pos2index(i.x, i.y, map_size.x)] == 'r')
                 {
                     scanR.setPosition(sf::Vector2f(i.x * 10.0f, i.y * 10.0f));
                     _RenderWindow->draw(scanR);
@@ -350,15 +362,18 @@ void _game::draw()
             }
         }
     }
-    // Draw enemies
+
+    // Drawing enemies
     for (auto &enemy : enemies)
     {
         enemy.shape.setFillColor(enemy_color);
         _RenderWindow->draw(enemy.shape);
     }
-    // Draw player
+
+    // Drawing player
     player.shape.setFillColor(player_color);
     _RenderWindow->draw(player.shape);
+
     // - Display
     _RenderWindow->display();
 }
@@ -366,21 +381,15 @@ void _game::draw()
 int _game::count_walls() const
 {
     int count = 0;
-    for (int i = 0; i < map_size[0]; ++i)
-    {
-        for (int j = 0; j < map_size[1]; ++j)
-        {
-            if (map[pos2index(i, j, map_size[0])] == 1)
+    for (int i = 0; i < map_size.x; ++i)
+        for (int j = 0; j < map_size.y; ++j)
+            if (map[pos2index(i, j, map_size.x)] == 1)
                 count++;
-        }
-    }
     return count;
 }
 
 void _game::update_tmp_map()
 {
-    for (size_t i = 0; i < map_size[2]; ++i)
-    {
+    for (size_t i = 0; i < map_size.z; ++i)
         tmp_map[i] = map[i];
-    }
 }
