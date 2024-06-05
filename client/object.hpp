@@ -6,7 +6,7 @@ class object : public sf::Vector2i
     sf::Vector2i previous = sf::Vector2i(0, 0);
     int direction;
     int type; // 1 - player, 2 - enemy
-    sf::RectangleShape shape = sf::RectangleShape(sf::Vector2f(10, 10));
+    sf::RectangleShape shape;
     object()
     {
         this->x = 0;
@@ -24,7 +24,6 @@ class object : public sf::Vector2i
     }
     void move()
     {
-        float step = 10;
         if (type == 1) // player movement
         {
             switch (direction)
@@ -70,9 +69,9 @@ class object : public sf::Vector2i
             }
         }
     }
-    void updateShape()
+    void updateShape(sf::Vector2f scale)
     {
         this->previous = sf::Vector2i(this->x, this->y);
-        this->shape.setPosition(sf::Vector2f(x * 10.0f, y * 10.0f));
+        this->shape.setPosition(sf::Vector2f(x * scale.x, y * scale.y));
     }
 };

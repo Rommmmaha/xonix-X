@@ -45,6 +45,6 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: build
-        path: bin/client.exe
-        retention-days: 7
+        path: bin/
+        retention-days: 3
         compression-level: 0

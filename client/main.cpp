@@ -1,16 +1,17 @@
-#include "_game.hpp"
-#pragma warning(disable : 4244 4267 4305)
-
+#include "game.hpp"
 int main()
 {
-    _game game;
-    while (game.running)
+    game _game;
+    while (_game.running)
     {
-        if (game.needInitialization)
-            game.init();
-        game.update();
-        game.draw();
+        if (_game.needInitialization)
+            _game.init();
+        _game.update();
+        _game.draw();
     }
-    game.destruct();
     return 0;
+}
+int WinMain()
+{
+    return main();
 }

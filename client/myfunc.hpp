@@ -85,17 +85,25 @@ sf::Color HSV2RGB(float fH, float fV, float fS)
 
 void getNeighbours(int *map, sf::Vector2i pos, sf::Vector3<size_t> map_size, int type)
 {
-    if (pos.x < 0 || pos.y < 0 || pos.x >= map_size.x || pos.y >= map_size.y)
+    std::vector<sf::Vector2i> queue;
+    queue.push_back(pos);
+
+    while (!queue.empty())
     {
-        return;
+        sf::Vector2i current = queue.front();
+        queue.erase(queue.begin());
+
+        if (current.x < 0 || current.y < 0 || current.x >= map_size.x || current.y >= map_size.y)
+            continue;
+
+        size_t index = pos2index(current.x, current.y, map_size.x);
+        if (map[index] != 0)
+            continue;
+
+        map[index] = type;
+        queue.push_back(sf::Vector2i(current.x - 1, current.y));
+        queue.push_back(sf::Vector2i(current.x + 1, current.y));
+        queue.push_back(sf::Vector2i(current.x, current.y - 1));
+        queue.push_back(sf::Vector2i(current.x, current.y + 1));
     }
-    if (map[pos2index(pos.x, pos.y, map_size.x)] != 0)
-    {
-        return;
-    }
-    map[pos2index(pos.x, pos.y, map_size.x)] = type; // scanned
-    getNeighbours(map, sf::Vector2i(pos.x - 1, pos.y), map_size, type);
-    getNeighbours(map, sf::Vector2i(pos.x + 1, pos.y), map_size, type);
-    getNeighbours(map, sf::Vector2i(pos.x, pos.y - 1), map_size, type);
-    getNeighbours(map, sf::Vector2i(pos.x, pos.y + 1), map_size, type);
 }
