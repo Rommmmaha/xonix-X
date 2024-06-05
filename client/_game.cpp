@@ -5,7 +5,6 @@ _game::_game()
 {
     running = true;
     needInitialization = true;
-    gradient = true;
     number_of_enemies = 3;
 }
 
@@ -13,7 +12,7 @@ void _game::init()
 {
     this->destruct();
     srand(0);
-    // srand(time(NULL));
+    srand(time(NULL));
     needInitialization = false;
     // Initialization
     _Clock.restart();
@@ -46,11 +45,9 @@ void _game::init()
         map[pos2index(map_size[0] - 2, i, map_size[0])] = 1;
         map[pos2index(map_size[0] - 1, i, map_size[0])] = 1;
     }
-    // Variables
-    score = 0;
     // Player
     player = object(1, int(map_size[0]) / 2, 1);
-    player.direction = sf::Keyboard::Space;
+    player.direction = -1;
     // Enemies
     enemies.clear();
     for (; enemies.size() < number_of_enemies;)
@@ -79,22 +76,30 @@ void _game::destruct()
     {
         delete tmp_map;
     }
-    leftNeighbors.clear();
-    rightNeighbors.clear();
+    leftNeighbours.clear();
+    rightNeighbours.clear();
 }
 
 void _game::update()
 {
-    // Update title
+    // Updating title
     {
         int preplaced = 4 * (map_size[0] + map_size[1] - 4);
         float percentage = 100.0f * (count_walls() - preplaced) / (map_size[2] - preplaced);
-        _RenderWindow->setTitle(std::to_string(percentage));
         if (percentage > 90.0f)
         {
+            ++number_of_enemies;
             needInitialization = true;
             return;
         }
+
+        std::string title;
+        title += "Level: ";
+        title += std::to_string(number_of_enemies - 2);
+        title += "  |  ";
+        title += std::to_string(int(percentage));
+        title += "% < 90%";
+        _RenderWindow->setTitle(title);
     }
     // Events
     sf::Event event;
@@ -122,14 +127,10 @@ void _game::update()
                     player.direction = event.key.code;
                 }
                 break;
-            case sf::Keyboard::G:
-                gradient = !gradient;
-                needInitialization = true;
-                return;
             case sf::Keyboard::R:
                 needInitialization = true;
                 return;
-            case sf::Keyboard::T:
+            case sf::Keyboard::D:
                 debug = !debug;
                 break;
             case sf::Keyboard::Escape:
@@ -139,23 +140,20 @@ void _game::update()
         }
     }
     // Color gradients
-    if (gradient)
-    {
-        float speed = 30;
-        float hue = _Clock.getElapsedTime().asSeconds() * speed;
-        player_color = HSV2RGB(120.0f, 1.0f, 1.0f);
-        enemy_color = HSV2RGB(hue, 1.0f, 0.4f);
-        wall_color = HSV2RGB(hue, 0.5f, 0.6f);
-        path_color = HSV2RGB(hue, 0.4f, 0.2f);
-        background_color = HSV2RGB(hue, 0.2f, 0.2f);
-    }
+    float speed = 30;
+    float hue = _Clock.getElapsedTime().asSeconds() * speed;
+    player_color = HSV2RGB(120.0f, 1.0f, 1.0f);
+    enemy_color = HSV2RGB(hue, 1.0f, 0.4f);
+    wall_color = HSV2RGB(hue, 0.5f, 0.6f);
+    path_color = HSV2RGB(hue, 0.4f, 0.2f);
+    background_color = HSV2RGB(hue, 0.2f, 0.2f);
     // - Calculations
     // Player movement
     player.move();
     // Prevent player from going out of map
     if (player.x < 0 || player.x > map_size[0] - 1 || player.y < 0 || player.y > map_size[1] - 1)
     {
-        player.direction = sf::Keyboard::Space;
+        player.direction = -1;
         for (; player.x < 0; player.x++)
             ;
         for (; player.x > map_size[0] - 1; player.x--)
@@ -176,24 +174,24 @@ void _game::update()
     {
         // Creating path
         map[pos2index(player.x, player.y, map_size[0])] = 2;
-        // Adding neighbors
+        // Adding Neighbours
         switch (player.direction)
         {
         case sf::Keyboard::Up:
-            leftNeighbors.push_back(sf::Vector2i(player.x - 1, player.y));
-            rightNeighbors.push_back(sf::Vector2i(player.x + 1, player.y));
+            leftNeighbours.push_back(sf::Vector2i(player.x - 1, player.y));
+            rightNeighbours.push_back(sf::Vector2i(player.x + 1, player.y));
             break;
         case sf::Keyboard::Down:
-            leftNeighbors.push_back(sf::Vector2i(player.x + 1, player.y));
-            rightNeighbors.push_back(sf::Vector2i(player.x - 1, player.y));
+            leftNeighbours.push_back(sf::Vector2i(player.x + 1, player.y));
+            rightNeighbours.push_back(sf::Vector2i(player.x - 1, player.y));
             break;
         case sf::Keyboard::Left:
-            leftNeighbors.push_back(sf::Vector2i(player.x, player.y + 1));
-            rightNeighbors.push_back(sf::Vector2i(player.x, player.y - 1));
+            leftNeighbours.push_back(sf::Vector2i(player.x, player.y + 1));
+            rightNeighbours.push_back(sf::Vector2i(player.x, player.y - 1));
             break;
         case sf::Keyboard::Right:
-            leftNeighbors.push_back(sf::Vector2i(player.x, player.y - 1));
-            rightNeighbors.push_back(sf::Vector2i(player.x, player.y + 1));
+            leftNeighbours.push_back(sf::Vector2i(player.x, player.y - 1));
+            rightNeighbours.push_back(sf::Vector2i(player.x, player.y + 1));
             break;
         }
     }
@@ -208,10 +206,10 @@ void _game::update()
             }
             update_tmp_map();
             std::vector<sf::Vector2i> left, right;
-            for (auto &i : leftNeighbors)
-                getNeighbors(tmp_map, i, map_size, 'l');
-            for (auto &i : rightNeighbors)
-                getNeighbors(tmp_map, i, map_size, 'r');
+            for (auto &i : leftNeighbours)
+                getNeighbours(tmp_map, i, map_size, 'l');
+            for (auto &i : rightNeighbours)
+                getNeighbours(tmp_map, i, map_size, 'r');
             for (size_t i = 0; i < map_size[0]; ++i)
             {
                 for (size_t j = 0; j < map_size[1]; ++j)
@@ -228,9 +226,9 @@ void _game::update()
             else
                 for (auto i : right)
                     map[pos2index(i.x, i.y, map_size[0])] = 1;
-            leftNeighbors.clear();
-            rightNeighbors.clear();
-            player.direction = sf::Keyboard::Space;
+            leftNeighbours.clear();
+            rightNeighbours.clear();
+            player.direction = -1;
         }
     }
     player.updateShape();
@@ -307,17 +305,17 @@ void _game::draw()
     sf::RectangleShape scanL(sf::Vector2f(10, 10));
     wall.setFillColor(wall_color);
     path.setFillColor(path_color);
-    scanL.setFillColor(sf::Color::Blue);
-    scanR.setFillColor(sf::Color::Red);
+    scanL.setFillColor(sf::Color(0, 0, 255, 100));
+    scanR.setFillColor(sf::Color(255, 0, 0, 100));
     sf::Vector2i i = sf::Vector2i(0, 0);
     if (debug)
     {
-        for (auto &i : leftNeighbors)
+        for (auto &i : leftNeighbours)
         {
             scanL.setPosition(sf::Vector2f(i.x * 10.0f, i.y * 10.0f));
             _RenderWindow->draw(scanL);
         }
-        for (auto &i : rightNeighbors)
+        for (auto &i : rightNeighbours)
         {
             scanR.setPosition(sf::Vector2f(i.x * 10.0f, i.y * 10.0f));
             _RenderWindow->draw(scanR);

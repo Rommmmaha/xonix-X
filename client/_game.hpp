@@ -21,8 +21,6 @@ class _game
     sf::Color background_color;
 
     bool debug;
-    bool gradient;
-    int score;
     int number_of_enemies;
     int *map;
     int *tmp_map;
@@ -31,7 +29,7 @@ class _game
     object player;
     std::vector<object> enemies;
 
-    std::vector<sf::Vector2i> leftNeighbors, rightNeighbors;
+    std::vector<sf::Vector2i> leftNeighbours, rightNeighbours;
     sf::Clock _Clock;
     sf::RenderWindow *_RenderWindow;
 

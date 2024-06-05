@@ -83,7 +83,7 @@ sf::Color HSV2RGB(float fH, float fV, float fS)
     return sf::Color(sf::Uint8(fR * 255), sf::Uint8(fG * 255), sf::Uint8(fB * 255));
 }
 
-void getNeighbors(int *map, sf::Vector2i pos, size_t map_size[3], int type)
+void getNeighbours(int *map, sf::Vector2i pos, size_t map_size[3], int type)
 {
     if (pos.x < 0 || pos.y < 0 || pos.x >= map_size[0] || pos.y >= map_size[1])
     {
@@ -94,8 +94,8 @@ void getNeighbors(int *map, sf::Vector2i pos, size_t map_size[3], int type)
         return;
     }
     map[pos2index(pos.x, pos.y, map_size[0])] = type; // scanned
-    getNeighbors(map, sf::Vector2i(pos.x - 1, pos.y), map_size, type);
-    getNeighbors(map, sf::Vector2i(pos.x + 1, pos.y), map_size, type);
-    getNeighbors(map, sf::Vector2i(pos.x, pos.y - 1), map_size, type);
-    getNeighbors(map, sf::Vector2i(pos.x, pos.y + 1), map_size, type);
+    getNeighbours(map, sf::Vector2i(pos.x - 1, pos.y), map_size, type);
+    getNeighbours(map, sf::Vector2i(pos.x + 1, pos.y), map_size, type);
+    getNeighbours(map, sf::Vector2i(pos.x, pos.y - 1), map_size, type);
+    getNeighbours(map, sf::Vector2i(pos.x, pos.y + 1), map_size, type);
 }

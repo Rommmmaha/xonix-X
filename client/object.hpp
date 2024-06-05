@@ -29,7 +29,7 @@ class object : public sf::Vector2i
         {
             switch (direction)
             {
-            case sf::Keyboard::Space:
+            case -1:
                 break;
             case sf::Keyboard::Up:
                 --y;
@@ -49,6 +49,8 @@ class object : public sf::Vector2i
         {
             switch (direction)
             {
+            case -1:
+                break;
             case 0: // UL
                 --x;
                 --y;
