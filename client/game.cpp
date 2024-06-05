@@ -14,12 +14,10 @@ game::game()
     sb_intro.loadFromFile("resources/intro.wav");
     sb_damaged.loadFromFile("resources/damaged.wav");
     sb_captured.loadFromFile("resources/captured.wav");
-    sb_dead.loadFromFile("resources/dead.wav");
 
     intro.setBuffer(sb_intro);
     damaged.setBuffer(sb_damaged);
     captured.setBuffer(sb_captured);
-    dead.setBuffer(sb_dead);
 
     intro.setVolume(10.f);
 
@@ -90,11 +88,11 @@ void game::init()
 
     // Restarting clock
     _Clock.restart();
-    _GlobalClock.restart();
     // First start
     if (firstStart)
     {
         intro.play();
+        _GlobalClock.restart();
         firstStart = false;
     }
 }
@@ -427,14 +425,14 @@ void game::draw()
         int alpha = 0, alpha2 = 255;
         _RenderWindow->setFramerateLimit(0);
         if (0.16 < seconds && seconds < 1.18)
-            alpha = int((seconds - 0.16) / 0.025) % 2 ? (100 * (seconds - 0.16f)) : 0;
+            alpha = int((seconds - 0.16f) / 0.025f) % 2 ? int(100.0f * (seconds - 0.16f)) : 0;
         if (1.16 < seconds && seconds < 3)
             alpha = 255;
         if (3 < seconds)
         {
             _RenderWindow->setFramerateLimit(fps);
-            alpha = (5 - _GlobalClock.getElapsedTime().asSeconds()) / 2 * 255;
-            alpha2 = (5 - _GlobalClock.getElapsedTime().asSeconds()) / 2 * 255;
+            alpha = int((5 - _GlobalClock.getElapsedTime().asSeconds()) / 2.0f) * 255;
+            alpha2 = int((5 - _GlobalClock.getElapsedTime().asSeconds()) / 2.0f) * 255;
         }
 
         sf::Text _Text;
@@ -445,7 +443,7 @@ void game::draw()
                                        _RenderWindow->getSize().y / 2 - _Text.getGlobalBounds().height / 2 -
                                            _Text.getCharacterSize()));
         _Text.setFillColor(sf::Color(255, 255, 255, alpha));
-        sf::RectangleShape bg(sf::Vector2f(_RenderWindow->getSize().x, _RenderWindow->getSize().y));
+        sf::RectangleShape bg(V2_convert<float>(_RenderWindow->getSize()));
         bg.setFillColor(sf::Color(0, 0, 0, alpha2));
 
         _RenderWindow->draw(bg);

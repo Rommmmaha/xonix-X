@@ -52,7 +52,6 @@ class game
     sf::Sound intro;
     sf::Sound damaged;
     sf::Sound captured;
-    sf::Sound dead;
 
     sf::Font font;
     int count_walls() const;
