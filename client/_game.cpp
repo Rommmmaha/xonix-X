@@ -12,7 +12,7 @@ void _game::init()
 {
     this->destruct();
     srand(0);
-    srand(time(NULL));
+    srand(unsigned int(time(NULL)));
     needInitialization = false;
     // Initialization
     _Clock.restart();
@@ -84,7 +84,7 @@ void _game::update()
 {
     // Updating title
     {
-        int preplaced = 4 * (map_size[0] + map_size[1] - 4);
+        int preplaced = 4 * (int(map_size[0]) + int(map_size[1]) - 4);
         float percentage = 100.0f * (count_walls() - preplaced) / (map_size[2] - preplaced);
         if (percentage > 90.0f)
         {
@@ -210,14 +210,14 @@ void _game::update()
                 getNeighbours(tmp_map, i, map_size, 'l');
             for (auto &i : rightNeighbours)
                 getNeighbours(tmp_map, i, map_size, 'r');
-            for (size_t i = 0; i < map_size[0]; ++i)
+            for (sf::Vector2i i{0, 0}; i.y < map_size[1]; ++i.y)
             {
-                for (size_t j = 0; j < map_size[1]; ++j)
+                for (i.x = 0; i.x < map_size[0]; ++i.x)
                 {
-                    if (tmp_map[pos2index(i, j, map_size[0])] == 'l')
-                        left.push_back(sf::Vector2i(i, j));
-                    if (tmp_map[pos2index(i, j, map_size[0])] == 'r')
-                        right.push_back(sf::Vector2i(i, j));
+                    if (tmp_map[pos2index(i.x, i.y, map_size[0])] == 'l')
+                        left.push_back(i);
+                    if (tmp_map[pos2index(i.x, i.y, map_size[0])] == 'r')
+                        right.push_back(i);
                 }
             }
             if (left.size() < right.size())
