@@ -24,4 +24,4 @@ jobs:
         name: build
         path: bin/
         retention-days: 3
-        compression-level: 0
+        compression-level: 9

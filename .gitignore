@@ -1,4 +1,5 @@
 *.pdb
+*.exe
 *.user
 .vs/
 x64/
