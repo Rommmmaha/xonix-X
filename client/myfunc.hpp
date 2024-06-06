@@ -14,7 +14,7 @@ template <typename T> T max(T a, T b)
 // Vector2 functions
 template <typename T, typename U> sf::Vector2<T> V2_convert(sf::Vector2<U> a)
 {
-    return sf::Vector2<T>(a.x, a.y);
+    return sf::Vector2<T>(T(a.x), T(a.y));
 }
 
 template <typename T> sf::Vector2<T> V2_invert(sf::Vector2<T> a)

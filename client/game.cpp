@@ -7,9 +7,13 @@ game::game()
 
     fps = 10;
     scale = 20;
+    debug = false;
     running = true;
     needInitialization = true;
     number_of_enemies = 2;
+
+    map = nullptr;
+    tmp_map = nullptr;
 
     sb_intro.loadFromFile("resources/intro.wav");
     sb_damaged.loadFromFile("resources/damaged.wav");
@@ -272,10 +276,10 @@ void game::update()
             }
 
             if (left.size() < right.size())
-                for (auto i : left)
+                for (auto &i : left)
                     map[pos2index(i.x, i.y, map_size.x)] = 1;
             else
-                for (auto i : right)
+                for (auto &i : right)
                     map[pos2index(i.x, i.y, map_size.x)] = 1;
 
             leftNeighbours.clear();
@@ -431,17 +435,14 @@ void game::draw()
         if (3 < seconds)
         {
             _RenderWindow->setFramerateLimit(fps);
-            alpha = int((5 - _GlobalClock.getElapsedTime().asSeconds()) / 2.0f) * 255;
-            alpha2 = int((5 - _GlobalClock.getElapsedTime().asSeconds()) / 2.0f) * 255;
+            alpha = int((5 - _GlobalClock.getElapsedTime().asSeconds()) / 2.0f * 255);
+            alpha2 = alpha;
         }
 
-        sf::Text _Text;
-        _Text.setString("xonix-X");
-        _Text.setFont(font);
-        _Text.setCharacterSize(100);
+        sf::Text _Text("xonix-X", font, 120);
         _Text.setPosition(sf::Vector2f(_RenderWindow->getSize().x / 2 - _Text.getGlobalBounds().width / 2,
                                        _RenderWindow->getSize().y / 2 - _Text.getGlobalBounds().height / 2 -
-                                           _Text.getCharacterSize()));
+                                           _Text.getCharacterSize() / 2));
         _Text.setFillColor(sf::Color(255, 255, 255, alpha));
         sf::RectangleShape bg(V2_convert<float>(_RenderWindow->getSize()));
         bg.setFillColor(sf::Color(0, 0, 0, alpha2));

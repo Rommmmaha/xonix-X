@@ -3,22 +3,25 @@
 class object : public sf::Vector2i
 {
   public:
-    sf::Vector2i previous = sf::Vector2i(0, 0);
-    int direction;
     int type; // 1 - player, 2 - enemy
+    int direction;
     sf::RectangleShape shape;
+    sf::Vector2i previous = sf::Vector2i(0, 0);
     object()
     {
         this->x = 0;
         this->y = 0;
-        int direction = 0;
         this->type = 0;
+        this->direction = 0;
+        this->previous = sf::Vector2i(0, 0);
     }
     object(int type, int x = 0, int y = 0)
     {
         this->type = type;
         this->x = x;
         this->y = y;
+        this->direction = 0;
+        this->previous = sf::Vector2i(0, 0);
         if (this->type == 2)
             this->direction = rand() % 4;
     }
