@@ -119,8 +119,11 @@ void game::update()
         title += std::to_string(number_of_enemies - 2);
         title += "  |  ";
         title += std::to_string(int(percentage));
-        title += "% < 90%  |  FPS: ";
-        title += std::to_string(fps);
+        title += "% < 90%  |  FPS-lock: ";
+        if (fps == 0)
+            title += "OFF";
+        else
+            title += std::to_string(fps);
         _RenderWindow->setTitle(title);
     }
 
@@ -162,15 +165,19 @@ void game::update()
                 return;
             case sf::Keyboard::PageDown:
                 --scale;
-                scale = scale < 1 ? 1 : scale;
+                scale = scale < 5 ? 5 : scale;
                 needInitialization = true;
                 return;
             case sf::Keyboard::Equal:
                 ++fps;
+                if (fps < 10)
+                    fps = 10;
                 _RenderWindow->setFramerateLimit(fps);
                 break;
             case sf::Keyboard::Dash:
                 --fps;
+                if (fps < 10)
+                    fps = 0;
                 _RenderWindow->setFramerateLimit(fps);
                 break;
             case sf::Keyboard::Space:
@@ -181,10 +188,6 @@ void game::update()
             }
         }
     }
-    if (fps < 0)
-        fps = 0;
-    if (scale < 1)
-        scale = 10;
     // Color gradients
     float speed = 30;
     float hue = _Clock.getElapsedTime().asSeconds() * speed;
@@ -225,6 +228,7 @@ void game::update()
     {
         // Creating path
         map[pos2index(player.x, player.y, map_size.x)] = 2;
+
         // Adding Neighbours
         switch (player.direction)
         {
@@ -252,10 +256,8 @@ void game::update()
         if (map[pos2index(player.previous.x, player.previous.y, map_size.x)] == 2)
         {
             for (size_t i = 0; i < map_size.z; ++i)
-            {
                 if (map[i] == 2)
                     map[i] = 1;
-            }
             update_tmp_map();
             std::vector<sf::Vector2i> left, right;
 
