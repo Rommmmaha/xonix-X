@@ -9,6 +9,7 @@ int main()
         _game.update();
         _game.draw();
     }
+    _game.clear();
     return 0;
 }
 int WinMain()

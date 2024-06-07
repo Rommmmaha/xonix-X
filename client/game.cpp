@@ -4,13 +4,8 @@
 game::game()
 {
     srand(unsigned int(time(NULL)));
-
-    fps = 10;
-    scale = 20;
-    debug = false;
     running = true;
     needInitialization = true;
-    number_of_enemies = 2;
 
     map = nullptr;
     tmp_map = nullptr;
@@ -45,6 +40,14 @@ void game::clear()
 
 void game::init()
 {
+
+    if (firstStart)
+    {
+        fps = 10;
+        scale = 20;
+        debug = false;
+        number_of_enemies = 2;
+    }
     // Preparing
     clear();
     needInitialization = false;
@@ -154,6 +157,7 @@ void game::update()
                 }
                 break;
             case sf::Keyboard::R:
+                firstStart = true;
                 needInitialization = true;
                 return;
             case sf::Keyboard::D:
@@ -219,6 +223,7 @@ void game::update()
     // Check if player is on path
     if (map[pos2index(player.x, player.y, map_size.x)] == 2)
     {
+        damaged.play();
         needInitialization = true;
         return;
     }
@@ -349,6 +354,8 @@ void game::update()
 
 void game::draw()
 {
+    if (!running)
+        return;
     // - Render Start
 
     // Background
