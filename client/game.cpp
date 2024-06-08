@@ -1,5 +1,4 @@
 #include "game.hpp"
-#include "iostream"
 #include "myfunc.hpp"
 game::game()
 {
@@ -18,8 +17,6 @@ game::game()
     damaged.setBuffer(sb_damaged);
     captured.setBuffer(sb_captured);
 
-    intro.setVolume(10.f);
-
     font.loadFromFile("resources/04B_30__.TTF");
 
     _RenderWindow = new sf::RenderWindow(sf::VideoMode(800, 600), "xonix-x", sf::Style::Titlebar | sf::Style::Close);
@@ -28,12 +25,41 @@ game::game()
     firstStart = true;
 }
 
+bool game::isRunning() const
+{
+    return running;
+}
+
+void game::close()
+{
+    clear();
+    _RenderWindow->close();
+}
+
+int game::count_walls() const
+{
+    int count = 0;
+    for (int i = 0; i < map_size.x; ++i)
+        for (int j = 0; j < map_size.y; ++j)
+            if (map[pos2index(i, j, map_size.x)] == 1)
+                ++count;
+    return count;
+}
+
+void game::update_tmp_map()
+{
+    for (size_t i = 0; i < map_size.z; ++i)
+        tmp_map[i] = map[i];
+}
+
 void game::clear()
 {
     if (map != nullptr)
         delete map;
     if (tmp_map != nullptr)
         delete tmp_map;
+    map = nullptr;
+    tmp_map = nullptr;
     leftNeighbours.clear();
     rightNeighbours.clear();
 }
@@ -461,20 +487,4 @@ void game::draw()
     }
     // - Display
     _RenderWindow->display();
-}
-
-int game::count_walls() const
-{
-    int count = 0;
-    for (int i = 0; i < map_size.x; ++i)
-        for (int j = 0; j < map_size.y; ++j)
-            if (map[pos2index(i, j, map_size.x)] == 1)
-                ++count;
-    return count;
-}
-
-void game::update_tmp_map()
-{
-    for (size_t i = 0; i < map_size.z; ++i)
-        tmp_map[i] = map[i];
 }

@@ -7,17 +7,17 @@ class game
 {
   public:
     game();
-    void clear();
-    void draw_intro();
 
     void init();
     void update();
     void draw();
+    void close();
 
-    bool running;
+    bool isRunning() const;
     bool needInitialization;
 
   private:
+    bool running;
     bool firstStart;
     int fps;
     int number_of_enemies;
@@ -47,13 +47,14 @@ class game
     sf::SoundBuffer sb_intro;
     sf::SoundBuffer sb_damaged;
     sf::SoundBuffer sb_captured;
-    sf::SoundBuffer sb_dead;
 
     sf::Sound intro;
     sf::Sound damaged;
     sf::Sound captured;
 
     sf::Font font;
+
     int count_walls() const;
     void update_tmp_map();
+    void clear();
 };

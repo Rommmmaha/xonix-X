@@ -2,14 +2,14 @@
 int main()
 {
     game _game;
-    while (_game.running)
+    while (_game.isRunning())
     {
         if (_game.needInitialization)
             _game.init();
         _game.update();
         _game.draw();
     }
-    _game.clear();
+    _game.close();
     return 0;
 }
 int WinMain()
