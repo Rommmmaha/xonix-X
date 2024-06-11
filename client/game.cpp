@@ -107,7 +107,7 @@ void game::init()
     }
 
     // Player
-    player = object(1, int(map_size.x) / 2, 1);
+    player = _player(int(map_size.x) / 2, 1);
     player.shape = sf::RectangleShape(scale_vector);
     player.direction = -1;
 
@@ -115,7 +115,7 @@ void game::init()
     enemies.clear();
     for (; enemies.size() < number_of_enemies;)
     {
-        enemies.push_back(object(2, 3 + rand() % (map_size.x - 6), 3 + rand() % (map_size.y - 6)));
+        enemies.push_back(_enemy(3 + rand() % (map_size.x - 6), 3 + rand() % (map_size.y - 6)));
         enemies.back().shape = sf::RectangleShape(scale_vector);
     }
 

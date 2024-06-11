@@ -31,8 +31,8 @@ class game
     sf::Vector2f scale_vector;
     sf::RenderWindow *_RenderWindow;
 
-    object player;
-    std::vector<object> enemies;
+    _player player;
+    std::vector<_enemy> enemies;
 
     sf::Clock _Clock;
     sf::Clock _GlobalClock;
