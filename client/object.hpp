@@ -61,19 +61,19 @@ class _enemy : public _object
         {
         case -1:
             break;
-        case 0: // UL
+        case 0:
             --x;
             --y;
             break;
-        case 1: // DL
+        case 1:
             --x;
             ++y;
             break;
-        case 2: // UR
+        case 2:
             ++x;
             --y;
             break;
-        case 3: // DR
+        case 3:
             ++x;
             ++y;
             break;

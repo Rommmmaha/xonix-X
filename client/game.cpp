@@ -66,7 +66,6 @@ void game::clear()
 
 void game::init()
 {
-
     if (firstStart)
     {
         fps = 10;
